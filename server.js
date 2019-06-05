@@ -21,6 +21,7 @@ server.get('/', (req, res) => {
 
 function logger(req, res, next) {
   console.log(`${req.method} Request`)
+  next();
 };
 
 module.exports = server;
