@@ -5,12 +5,15 @@ const express = require('express');
 const server = express();
 
 // middleware
+server.use(express.json())
 server.use(logger)
 
 // require router
 const PostsRouter = require('./posts/postRouter')
+const UsersRouter = require('./users/userRouter')
 
 server.use('/api/posts', PostsRouter)
+server.use('/api/users', UsersRouter)
 
 
 server.get('/', (req, res) => {
