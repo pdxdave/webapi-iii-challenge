@@ -63,8 +63,7 @@ router.put('/:id', validatePostId, async (req, res) => {
 })
 
 
-            
-
+        
 // custom middleware
 
 async function validatePostId(req, res, next) {
