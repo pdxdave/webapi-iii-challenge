@@ -29,7 +29,7 @@ router.post('/:id/posts', validatePost, async (req, res) => {
       res.status(201).json(req.post)
 });
 
-router.get('/', validateUser, async (req, res) => {
+router.get('/',  async (req, res) => {
     try {
         const users = await Users.get(req.query)
         res.status(200).json(users)
