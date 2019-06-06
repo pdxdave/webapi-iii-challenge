@@ -3,29 +3,33 @@ const express = require('express');
 
 // link to users data
 const Users = require('./userDb');
+const Posts = require('../posts/postDb');
 
 // create express router
 const router = express.Router();
 
 
-router.post('/', async (req, res) => {
-    console.log(req.body)
-  try {
-    const newPost = req.body;
-    const posted = await Users.insert(newPost)
-    res.status(200).json(posted)
-   } catch (error) {
-        res.status(500).json({
-        message: "Error uploading content"
-    })
-  }
+// router.post('/',  async (req, res) => {
+//   try {
+//     const posted = await Users.insert(req.body)
+//     res.status(200).json(posted)
+//    } catch (error) {
+//         res.status(500).json({
+//         message: "Error uploading content"
+//     })
+//   }
+// });
+
+router.post('/', validateUser, async (req, res) => {
+      res.status(201).json(req.user)
 });
 
-router.post('/:id/posts', (req, res) => {
 
+router.post('/:id/posts', validatePost, async (req, res) => {
+      res.status(201).json(req.post)
 });
 
-router.get('/', async (req, res) => {
+router.get('/', validateUser, async (req, res) => {
     try {
         const users = await Users.get(req.query)
         res.status(200).json(users)
@@ -92,7 +96,7 @@ router.put('/:id',  validateUserId, async (req, res) => {
 
 //custom middleware
 
-async function validateUserId(req, res, next) {
+async function validateUserId(req, res, next) { 
     try {
         const id = req.params.id 
         const user = await Users.getById(id)
@@ -114,13 +118,13 @@ async function validateUserId(req, res, next) {
 
 async function validateUser(req, res, next) {
     try {
-        const valUser = req.body.name // got name from seeds user. is that right?
-        const user = await Users.getById(valUser)
+        const valUser = req.body 
+        const user = await Users.insert(valUser)
         if (user) {
             req.user = user;
             next()
         } else {
-            re.status(404).json({
+            res.status(404).json({
                 message: "No matching user"
             })
         }
@@ -129,11 +133,26 @@ async function validateUser(req, res, next) {
             message: "Failed to process request"
         })
     }
-
 };
 
-function validatePost(req, res, next) {
+async function validatePost(req, res, next) {
+    try {
+        const valPst = req.body
+        const post = await Posts.insert(valPst)
 
+        if (post) {
+            req.post = post;
+            next();
+        } else {
+            res.status(404).json({
+                message: "Failed to post"
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to process post"
+        })
+    }
 };
 
 module.exports = router;
